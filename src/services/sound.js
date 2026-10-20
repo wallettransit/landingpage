@@ -14,13 +14,26 @@ class SoundSystem {
   constructor() {
     this.ctx = null;
     this.isPlaying = false;
-    this.isMuted = false;
+    let savedMute = false;
+    try {
+      savedMute = localStorage.getItem('oyapay_audio_muted') === 'true';
+    } catch (e) {}
+    this.isMuted = savedMute;
     this.musicTimer = null;
     this.masterGain = null;
     this.sfxGain = null;
     this.bgGain = null;
     this.step = 0;
     this.listeners = new Set();
+  }
+
+  // Trigger subtle device haptic feedback if supported (iOS/Android)
+  haptic(pattern = 15) {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      try {
+        navigator.vibrate(pattern);
+      } catch (e) {}
+    }
   }
 
   init() {
@@ -30,7 +43,8 @@ class SoundSystem {
     this.ctx = new AudioContext();
 
     this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.setValueAtTime(1, this.ctx.currentTime);
+    const initialGain = this.isMuted ? 0 : 1;
+    this.masterGain.gain.setValueAtTime(initialGain, this.ctx.currentTime);
     this.masterGain.connect(this.ctx.destination);
 
     this.bgGain = this.ctx.createGain();
@@ -185,24 +199,31 @@ class SoundSystem {
 
   toggleMute() {
     this.isMuted = !this.isMuted;
+    try {
+      localStorage.setItem('oyapay_audio_muted', this.isMuted ? 'true' : 'false');
+    } catch (e) {}
     if (this.masterGain && this.ctx) {
       this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 1, this.ctx.currentTime);
     }
+    this.haptic(18);
     this.notify();
   }
 
   // UI Sound Effects
   playClick() {
+    this.haptic(10);
     this.ensureContext();
     this.playSynthNote(800, 'sine', 0.04, 0.12, this.sfxGain);
   }
 
   playTap() {
+    this.haptic(12);
     this.ensureContext();
     this.playSynthNote(520, 'sine', 0.08, 0.15, this.sfxGain);
   }
 
   playSuccess() {
+    this.haptic([20, 40, 30]);
     this.ensureContext();
     if (!this.ctx || this.isMuted) return;
     const now = this.ctx.currentTime;
@@ -214,6 +235,7 @@ class SoundSystem {
   }
 
   playCoin() {
+    this.haptic(15);
     this.ensureContext();
     if (!this.ctx || this.isMuted) return;
     this.playSynthNote(987.77, 'sine', 0.12, 0.18, this.sfxGain);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QRCode } from './QRCode';
 import { KekeRoad } from './KekeRoad';
+import { sound } from '../services/sound';
 
 export const Hero = () => {
   const [heroStep, setHeroStep] = useState(0);
@@ -325,10 +326,34 @@ export const Hero = () => {
               </div>
 
               {/* Dots */}
-              <div className="pdots">
-                <i className={heroStep === 0 ? 'active' : ''}></i>
-                <i className={heroStep === 1 ? 'active' : ''}></i>
-                <i className={heroStep === 2 ? 'active' : ''}></i>
+              <div className="pdots" role="tablist" aria-label="Phone steps">
+                <button
+                  type="button"
+                  aria-label="Step 1: Scan QR"
+                  className={heroStep === 0 ? 'active' : ''}
+                  onClick={() => {
+                    sound.playTap();
+                    setHeroStep(0);
+                  }}
+                ></button>
+                <button
+                  type="button"
+                  aria-label="Step 2: Pick Stop"
+                  className={heroStep === 1 ? 'active' : ''}
+                  onClick={() => {
+                    sound.playTap();
+                    setHeroStep(1);
+                  }}
+                ></button>
+                <button
+                  type="button"
+                  aria-label="Step 3: Instant Ticket"
+                  className={heroStep === 2 ? 'active' : ''}
+                  onClick={() => {
+                    sound.playTap();
+                    setHeroStep(2);
+                  }}
+                ></button>
               </div>
             </div>
           </div>

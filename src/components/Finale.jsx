@@ -6,6 +6,7 @@ export const Finale = () => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
+  const [queueNumber, setQueueNumber] = useState(384);
 
   const finRef = useRef(null);
   const canvasRef = useRef(null);
@@ -276,6 +277,13 @@ export const Finale = () => {
     }
     setError(false);
     sound.playSuccess();
+    const position = Math.floor(350 + Math.random() * 50);
+    setQueueNumber(position);
+    try {
+      const waitlist = JSON.parse(localStorage.getItem('oyapay_waitlist') || '[]');
+      waitlist.push({ email, role: who, date: new Date().toISOString(), position });
+      localStorage.setItem('oyapay_waitlist', JSON.stringify(waitlist));
+    } catch (err) {}
     setSubmitted(true);
   };
 
@@ -329,7 +337,10 @@ export const Finale = () => {
                   name="who"
                   value="driver"
                   checked={who === 'driver'}
-                  onChange={() => setWho('driver')}
+                  onChange={() => {
+                    sound.playClick();
+                    setWho('driver');
+                  }}
                 />
                 <span>I drive</span>
               </label>
@@ -339,7 +350,10 @@ export const Finale = () => {
                   name="who"
                   value="rider"
                   checked={who === 'rider'}
-                  onChange={() => setWho('rider')}
+                  onChange={() => {
+                    sound.playClick();
+                    setWho('rider');
+                  }}
                 />
                 <span>I ride</span>
               </label>
@@ -357,7 +371,7 @@ export const Finale = () => {
                 required
               />
               <button className="btn btn-ink" type="submit">
-                Notify me
+                Join Waitlist
               </button>
             </form>
 
@@ -366,12 +380,32 @@ export const Finale = () => {
                 Please enter a valid email address.
               </div>
             )}
+            <div className="join-trust-note">
+              🔒 No spam. We only contact you when the corridor opens near you.
+            </div>
           </>
         ) : (
-          <div className="ok" role="status" style={{ display: 'block' }}>
-            {who === 'driver'
-              ? "You're on the list, driver. We're starting with drivers, so we'll reach out first."
-              : "You're on the list. We'll reach out when OyaPay opens near you."}
+          <div className="ok-success" role="status">
+            <div className="ok-badge">🎉 Spot Reserved</div>
+            <h4>You're #{queueNumber} on the Lagos Pilot list!</h4>
+            <p>
+              {who === 'driver'
+                ? "You're prioritized, driver. We're launching corridor by corridor and our team will reach out with early onboard access."
+                : "You're in. As soon as your daily route goes live on OyaPay, you'll be among the first to ride cash-free."}
+            </p>
+            <div className="share-actions">
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  `I just joined the waitlist for OyaPay — the instant wallet for Lagos Danfos & Kekes. No more change wahala! Check it out: https://oyapay.ng`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-wa"
+                onClick={() => sound.playTap()}
+              >
+                <span>Share with fellow commuters on WhatsApp</span>
+              </a>
+            </div>
           </div>
         )}
       </div>

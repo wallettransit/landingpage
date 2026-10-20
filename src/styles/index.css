@@ -517,18 +517,25 @@ ul {
   z-index: 4;
 }
 
-.pdots i {
+.pdots i,
+.pdots button {
+  display: block;
   width: 6px;
   height: 6px;
   border-radius: 3px;
   background: #26332C;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
   transition: all 0.3s;
+  touch-action: manipulation;
 }
 
 .stepper[data-step="0"] .pdots i:nth-child(1),
 .stepper[data-step="1"] .pdots i:nth-child(2),
 .stepper[data-step="2"] .pdots i:nth-child(3),
-.pdots i.active {
+.pdots i.active,
+.pdots button.active {
   background: var(--amber);
   width: 18px;
 }
@@ -2398,4 +2405,403 @@ footer {
     gap: 8px;
   }
 }
+
+/* ---------- Lagos Fare Calculator Section ---------- */
+.calc-sec {
+  padding: 100px 0;
+  background: var(--ink);
+  color: var(--paper);
+  border-top: 1px solid var(--line);
+}
+
+.calc-header {
+  text-align: center;
+  max-width: 740px;
+  margin: 0 auto 46px;
+}
+
+.pill-tag {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(14, 157, 92, 0.15);
+  color: var(--em-l);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+  border: 1px solid rgba(14, 157, 92, 0.3);
+}
+
+.calc-toggle {
+  display: inline-flex;
+  gap: 6px;
+  background: var(--ink3);
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  margin-top: 24px;
+}
+
+.calc-toggle-btn {
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--mist);
+  transition: all 0.25s;
+}
+
+.calc-toggle-btn.active {
+  background: var(--em);
+  color: var(--ink);
+}
+
+.calc-card {
+  background: var(--ink2);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 38px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+
+.calc-corridors {
+  margin-bottom: 34px;
+}
+
+.calc-lbl {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mist);
+  margin-bottom: 14px;
+}
+
+.corridor-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.corridor-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 12px 18px;
+  background: var(--ink3);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.corridor-btn span {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--paper);
+}
+
+.corridor-btn small {
+  font-size: 12px;
+  color: var(--amber);
+  margin-top: 2px;
+}
+
+.corridor-btn:hover {
+  border-color: var(--mist);
+}
+
+.corridor-btn.active {
+  background: rgba(14, 157, 92, 0.12);
+  border-color: var(--em);
+}
+
+.corridor-btn.active span {
+  color: var(--em-l);
+}
+
+.calc-body {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.calc-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.calc-slider-group {
+  background: var(--ink3);
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+}
+
+.slider-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.slider-top span {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.slider-top b {
+  font-size: 18px;
+  color: var(--amber);
+}
+
+.calc-range {
+  width: 100%;
+  accent-color: var(--em);
+  cursor: pointer;
+  height: 6px;
+}
+
+.slider-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--mist);
+  margin-top: 8px;
+}
+
+.driver-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.insight-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--ink3);
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+
+.insight-item .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.insight-item .dot.yellow { background: var(--amber); }
+.insight-item .dot.green { background: var(--em); }
+
+.insight-item strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.insight-item p {
+  font-size: 13px;
+  color: var(--mist);
+  line-height: 1.4;
+}
+
+.calc-results {
+  background: var(--ink3);
+  border: 2px solid var(--line);
+  border-radius: 24px;
+  padding: 32px;
+  text-align: center;
+  position: relative;
+}
+
+.res-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--em);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.res-main small {
+  display: block;
+  font-size: 14px;
+  color: var(--mist);
+}
+
+.res-main h3 {
+  font-family: var(--disp);
+  font-size: 46px;
+  color: var(--paper);
+  line-height: 1.1;
+  margin: 6px 0 16px;
+}
+
+.res-saved {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  background: rgba(242, 183, 5, 0.1);
+  border: 1px dashed var(--amber);
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+
+.res-saved span {
+  font-size: 12px;
+  color: var(--paper2);
+}
+
+.res-saved strong {
+  font-size: 18px;
+  color: var(--amber);
+}
+
+.res-monthly {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+  margin-bottom: 22px;
+}
+
+.res-monthly .m-val {
+  font-family: var(--disp);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--em-l);
+}
+
+.res-monthly .m-lbl {
+  font-size: 13px;
+  color: var(--mist);
+}
+
+.btn-calc {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Rider View */
+.rider-perks {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.perk-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--ink3);
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+}
+
+.perk-icon {
+  font-size: 22px;
+}
+
+.perk-card h4 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.perk-card p {
+  font-size: 13px;
+  color: var(--mist);
+  line-height: 1.45;
+}
+
+.rider-summary {
+  font-size: 15px;
+  color: var(--paper2);
+  margin-bottom: 24px;
+}
+
+/* Waitlist card enhancements */
+.join-trust-note {
+  font-size: 13px;
+  color: var(--mist);
+  margin-top: 14px;
+  text-align: center;
+}
+
+.ok-success {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.ok-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.ok-success h4 {
+  font-family: var(--disp);
+  font-size: 28px;
+  color: var(--paper);
+  margin-bottom: 10px;
+}
+
+.ok-success p {
+  font-size: 15px;
+  color: var(--paper2);
+  max-width: 480px;
+  margin: 0 auto 20px;
+  line-height: 1.5;
+}
+
+.share-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-wa {
+  background: #25D366;
+  color: #0B1410;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 999px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-wa:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(37, 211, 102, 0.35);
+}
+
+@media (max-width: 840px) {
+  .calc-body {
+    grid-template-columns: 1fr;
+  }
+  .calc-card {
+    padding: 24px 18px;
+  }
+  .calc-results {
+    padding: 24px 18px;
+  }
+}
+
 
