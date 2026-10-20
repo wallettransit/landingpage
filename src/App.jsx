@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+import { AudioButton } from './components/AudioButton';
 
 // Pages
 import { Home } from './pages/Home';
@@ -23,6 +24,7 @@ export function App() {
           <Route path="/trust" element={<TrustPage />} />
         </Routes>
       </main>
+      <AudioButton />
       <Footer />
     </div>
   );

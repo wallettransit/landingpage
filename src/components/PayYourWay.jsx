@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { QRCode } from './QRCode';
+import { sound } from '../services/sound';
 
 const MODES = [
   {
@@ -164,15 +165,18 @@ export const PayYourWay = () => {
     userInteracted.current = true;
     if (e.key === 'ArrowRight') {
       e.preventDefault();
+      sound.playTap();
       selectTab((i + 1) % 4, true);
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
+      sound.playTap();
       selectTab((i + 3) % 4, true);
     }
   };
 
   const handleTabClick = (i) => {
     userInteracted.current = true;
+    sound.playTap();
     selectTab(i);
   };
 

@@ -2294,3 +2294,108 @@ footer {
   }
   .typed { border: 0; }
 }
+
+/* ---------- Audio Control Floating Pill ---------- */
+.audio-pill-wrap {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99;
+}
+
+.audio-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  background: #6D4AFF;
+  color: #FFFFFF;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 25px -4px rgba(109, 74, 255, 0.45), 0 4px 10px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.audio-pill:hover {
+  background: #5B35F5;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 28px -4px rgba(109, 74, 255, 0.55), 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+.audio-pill:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.audio-pill.active {
+  background: #6D4AFF;
+}
+
+.audio-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-icon svg {
+  display: block;
+}
+
+.audio-label {
+  white-space: nowrap;
+}
+
+/* Subtle animated equalizer bars when active */
+.audio-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 14px;
+  margin-left: 2px;
+}
+
+.audio-bars i {
+  width: 2.5px;
+  background: #FFFFFF;
+  border-radius: 2px;
+  animation: barBounce 0.8s ease-in-out infinite alternate;
+}
+
+.audio-bars i:nth-child(1) {
+  height: 8px;
+  animation-delay: 0.1s;
+}
+
+.audio-bars i:nth-child(2) {
+  height: 13px;
+  animation-delay: 0.3s;
+}
+
+.audio-bars i:nth-child(3) {
+  height: 6px;
+  animation-delay: 0.2s;
+}
+
+@keyframes barBounce {
+  0% { height: 4px; }
+  100% { height: 14px; }
+}
+
+@media (max-width: 760px) {
+  .audio-pill-wrap {
+    bottom: 18px;
+    right: 16px;
+  }
+  .audio-pill {
+    padding: 8px 14px;
+    font-size: 13px;
+    gap: 8px;
+  }
+}
+

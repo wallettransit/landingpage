@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { sound } from '../services/sound';
 
 export const Finale = () => {
   const [who, setWho] = useState('driver');
@@ -253,12 +254,14 @@ export const Finale = () => {
   }, []);
 
   const handleShootL = () => {
+    sound.playCoin();
     if (burstRef.current && shootLRef.current) {
       burstRef.current(shootLRef.current, 1);
     }
   };
 
   const handleShootR = () => {
+    sound.playCoin();
     if (burstRef.current && shootRRef.current) {
       burstRef.current(shootRRef.current, -1);
     }
@@ -268,9 +271,11 @@ export const Finale = () => {
     e.preventDefault();
     if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       setError(true);
+      sound.playClick();
       return;
     }
     setError(false);
+    sound.playSuccess();
     setSubmitted(true);
   };
 

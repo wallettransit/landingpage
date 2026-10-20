@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { sound } from '../services/sound';
 
 const FAQS = [
   {
@@ -39,6 +40,7 @@ export const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(null);
 
   const toggle = (idx) => {
+    sound.playClick();
     setOpenIndex((prev) => (prev === idx ? null : idx));
   };
 
