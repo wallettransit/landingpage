@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QRCode } from './QRCode';
+import { KekeRoad } from './KekeRoad';
 
 export const Hero = () => {
   const [heroStep, setHeroStep] = useState(0);
@@ -336,6 +337,8 @@ export const Hero = () => {
         <svg className="wave wave-front" viewBox="0 0 1600 200" preserveAspectRatio="none" aria-hidden="true">
           <path d="M0 120 C 260 30, 560 190, 860 100 S 1380 20, 1600 90 L1600 200 L0 200 Z" fill="#0B1410" />
         </svg>
+
+        <KekeRoad />
       </div>
     </section>
   );

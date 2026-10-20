@@ -1,0 +1,137 @@
+/* ---------- Traffic Fleet (Hero decoration along organic wave) ----------
+   Horizontal left-to-right side motion across the screen:
+   - Keke Marwa (agile, steady cruise)
+   - Lagos Danfo Bus (authentic iconic commuter bus)
+   - City Taxi / Sedan
+   No screen turn / zoom; pure clean side motion with rolling wheels and gentle engine rumble.
+*/
+
+.traffic-road {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  z-index: 7;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Base vehicle entity */
+.traffic-vehicle {
+  position: absolute;
+  left: 0;
+  bottom: 22px;
+  will-change: transform;
+}
+
+/* 1. Keke Marwa: 12s period */
+.keke-vehicle {
+  width: 92px;
+  height: 72px;
+  animation: driveAcross 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 0s;
+}
+
+/* 2. Lagos Danfo: 14s period, offset */
+.danfo-vehicle {
+  width: 125px;
+  height: 75px;
+  bottom: 24px;
+  animation: driveAcross 14.5s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+  animation-delay: -5.5s;
+}
+
+/* 3. City Taxi: 11s period, offset */
+.taxi-vehicle {
+  width: 110px;
+  height: 66px;
+  bottom: 20px;
+  animation: driveAcross 11s cubic-bezier(0.42, 0, 0.2, 1) infinite;
+  animation-delay: -9.5s;
+}
+
+@keyframes driveAcross {
+  0% {
+    transform: translate3d(-180px, 0, 0);
+    opacity: 0;
+  }
+  2% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(calc(100vw + 60px), 0, 0);
+    opacity: 0;
+  }
+}
+
+/* Shadow beneath vehicles */
+.traffic-shadow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 2px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(11, 20, 16, 0.45);
+  filter: blur(2.5px);
+}
+
+/* Subtle vehicle engine rumble/bob */
+.vehicle-bob {
+  width: 100%;
+  height: 100%;
+  animation: vehicleBob 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes vehicleBob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-2px); }
+}
+
+/* SVG styling */
+.vehicle-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Spinning wheels */
+.vehicle-wheel {
+  transform-box: view-box;
+  animation: wheelSpin 0.4s linear infinite;
+}
+
+@keyframes wheelSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 760px) {
+  .traffic-vehicle {
+    bottom: 14px;
+  }
+  .keke-vehicle {
+    width: 74px;
+    height: 58px;
+  }
+  .danfo-vehicle {
+    width: 98px;
+    height: 60px;
+  }
+  .taxi-vehicle {
+    width: 86px;
+    height: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .traffic-vehicle {
+    animation: none !important;
+    display: none;
+  }
+}
