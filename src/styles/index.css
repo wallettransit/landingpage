@@ -969,12 +969,13 @@ ul {
   margin-top: 6px;
 }
 
-.arc svg {
+.arc > svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   overflow: visible;
+  pointer-events: none;
 }
 
 .arc-tab {
@@ -995,22 +996,33 @@ ul {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--ink3);
   border: 2px solid var(--line);
+  position: relative;
+  color: var(--mist);
   transition: all 0.35s cubic-bezier(0.3, 1.5, 0.5, 1);
 }
 
 .arc-tab .ic svg {
+  position: static;
+  inset: auto;
   width: 30px;
   height: 30px;
   stroke: var(--mist);
   fill: none;
-  stroke-width: 2;
+  stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: stroke 0.3s;
+  display: block;
+  transition: stroke 0.3s, fill 0.3s;
+}
+
+.arc-tab .ic svg [fill="currentColor"] {
+  fill: var(--mist);
+  transition: fill 0.3s;
 }
 
 .arc-tab .lb {
@@ -1024,16 +1036,30 @@ ul {
 
 .arc-tab:hover .ic {
   border-color: var(--em-l);
+  color: var(--paper);
+}
+
+.arc-tab:hover .ic svg {
+  stroke: var(--paper);
+}
+
+.arc-tab:hover .ic svg [fill="currentColor"] {
+  fill: var(--paper);
 }
 
 .arc-tab[aria-selected="true"] .ic {
   background: var(--em);
   border-color: var(--em);
+  color: var(--ink);
   transform: scale(1.18);
 }
 
 .arc-tab[aria-selected="true"] .ic svg {
   stroke: var(--ink);
+}
+
+.arc-tab[aria-selected="true"] .ic svg [fill="currentColor"] {
+  fill: var(--ink);
 }
 
 .arc-tab[aria-selected="true"] .lb {
