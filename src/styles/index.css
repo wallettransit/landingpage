@@ -2758,13 +2758,13 @@ footer {
 .ok-success h4 {
   font-family: var(--disp);
   font-size: 28px;
-  color: var(--paper);
+  color: var(--ink);
   margin-bottom: 10px;
 }
 
 .ok-success p {
   font-size: 15px;
-  color: var(--paper2);
+  color: var(--stone);
   max-width: 480px;
   margin: 0 auto 20px;
   line-height: 1.5;
