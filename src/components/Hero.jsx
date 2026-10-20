@@ -9,24 +9,29 @@ export const Hero = () => {
   const r1Ref = useRef(null);
   const [stops, setStops] = useState([]);
 
-  // Calculate stop markers along the wave curve
+  // Calculate stop markers along the wave curve safely
   useEffect(() => {
     if (r1Ref.current) {
-      const path = r1Ref.current;
-      const length = path.getTotalLength();
-      const points = [0.12, 0.34, 0.58, 0.8].map((t) => {
-        const pt = path.getPointAtLength(length * t);
-        return { cx: pt.x, cy: pt.y };
-      });
-      setStops(points);
+      try {
+        const path = r1Ref.current;
+        if (path.getTotalLength) {
+          const length = path.getTotalLength();
+          if (length > 0) {
+            const points = [0.12, 0.34, 0.58, 0.8].map((t) => {
+              const pt = path.getPointAtLength(length * t);
+              return { cx: pt.x, cy: pt.y };
+            });
+            setStops(points);
+          }
+        }
+      } catch (err) {
+        // Fallback for Safari geometry not available
+      }
     }
   }, []);
 
   // Phone stepper animation
   useEffect(() => {
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
-
     let timer = null;
     const stage = stageRef.current;
     if (!stage) return;
@@ -46,7 +51,7 @@ export const Hero = () => {
           }
         });
       },
-      { threshold: 0.25 }
+      { threshold: 0.05 }
     );
 
     observer.observe(stage);
@@ -58,9 +63,6 @@ export const Hero = () => {
 
   // Mouse / Pointer Parallax
   useEffect(() => {
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
-
     let mx = 0;
     let my = 0;
     let tx = 0;
@@ -100,14 +102,17 @@ export const Hero = () => {
       }
     };
 
-    const stageObserver = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        isVisible = e.isIntersecting;
-        if (isVisible && !raf) {
-          raf = requestAnimationFrame(frame);
-        }
-      });
-    }, { threshold: 0 });
+    const stageObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          isVisible = e.isIntersecting;
+          if (isVisible && !raf) {
+            raf = requestAnimationFrame(frame);
+          }
+        });
+      },
+      { threshold: 0 }
+    );
 
     if (stageRef.current) stageObserver.observe(stageRef.current);
     raf = requestAnimationFrame(frame);

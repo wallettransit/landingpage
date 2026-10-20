@@ -18,27 +18,33 @@ export const Finale = () => {
   const rafRef = useRef(0);
   const rainedRef = useRef(false);
 
+  const burstRef = useRef(null);
+
   useEffect(() => {
     const fin = finRef.current;
     const cv = canvasRef.current;
     if (!fin || !cv) return;
 
     const ctx = cv.getContext('2d');
+    if (!ctx) return;
+
     const BW = 22;
     let W = 0;
     let H = 0;
     let dpr = 1;
 
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     const floor = () => H - 4;
 
     function size() {
+      if (!fin || !cv) return;
       const r = fin.getBoundingClientRect();
       dpr = Math.min(2, window.devicePixelRatio || 1);
-      W = r.width;
-      H = r.height;
+      W = r.width || window.innerWidth;
+      H = r.height || 920;
       cv.width = Math.round(W * dpr);
       cv.height = Math.round(H * dpr);
+      cv.style.width = `${W}px`;
+      cv.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       hmRef.current = new Array(Math.ceil(W / BW) + 2).fill(0);
       partsRef.current.forEach((p) => {
@@ -66,10 +72,10 @@ export const Finale = () => {
 
     function restNow(p) {
       const b = Math.max(0, Math.min(hmRef.current.length - 1, (p.x / BW) | 0));
-      p.y = floor() - hmRef.current[b] - p.s * 0.25;
+      p.y = floor() - (hmRef.current[b] || 0) - p.s * 0.25;
       p.rest = true;
       p.vx = p.vy = p.vr = 0;
-      hmRef.current[b] = Math.min(hmRef.current[b] + p.s * 0.3, 240);
+      hmRef.current[b] = Math.min((hmRef.current[b] || 0) + p.s * 0.3, 240);
     }
 
     function add(p) {
@@ -99,7 +105,7 @@ export const Finale = () => {
         }
 
         const b = Math.max(0, Math.min(hmRef.current.length - 1, (p.x / BW) | 0));
-        const fy = floor() - hmRef.current[b] - p.s * 0.25;
+        const fy = floor() - (hmRef.current[b] || 0) - p.s * 0.25;
         if (p.y >= fy) {
           p.y = fy;
           if (Math.abs(p.vy) > 2.4) {
@@ -109,7 +115,7 @@ export const Finale = () => {
           } else {
             p.rest = true;
             p.vy = p.vx = p.vr = 0;
-            hmRef.current[b] = Math.min(hmRef.current[b] + p.s * 0.3, 240);
+            hmRef.current[b] = Math.min((hmRef.current[b] || 0) + p.s * 0.3, 240);
           }
         }
         moving++;
@@ -191,34 +197,25 @@ export const Finale = () => {
       }
     }
 
-    function burst(btn, dir) {
-      if (!btn) return;
+    burstRef.current = (btn, dir) => {
+      if (!btn || !fin) return;
       const nozzle = btn.querySelector('.nozzle');
-      if (!nozzle) return;
-      const nz = nozzle.getBoundingClientRect();
+      const nz = (nozzle || btn).getBoundingClientRect();
       const fr = fin.getBoundingClientRect();
       const x = nz.left + nz.width / 2 - fr.left;
       const y = nz.top + nz.height / 2 - fr.top;
 
       for (let i = 0; i < 16; i++) {
-        if (reduce) {
-          const p = make(W / 2 + (Math.random() - 0.5) * 420, 0, 0, 0);
-          restNow(p);
-          add(p);
-          continue;
-        }
         setTimeout(() => {
           add(make(x, y, dir * (4 + Math.random() * 7), -(11 + Math.random() * 9)));
           runningRef.current = true;
           kick();
         }, i * 28);
       }
-      if (reduce) draw();
-    }
+    };
 
     function rain() {
-      if (reduce) return;
-      for (let i = 0; i < 40; i++) {
+      for (let i = 0; i < 35; i++) {
         setTimeout(() => {
           add(make(40 + Math.random() * (W - 80), -40, (Math.random() - 0.5) * 2, Math.random() * 2));
           runningRef.current = true;
@@ -227,22 +224,8 @@ export const Finale = () => {
       }
     }
 
-    const onShootL = () => burst(shootLRef.current, 1);
-    const onShootR = () => burst(shootRRef.current, -1);
-
-    const btnL = shootLRef.current;
-    const btnR = shootRRef.current;
-    if (btnL) btnL.addEventListener('click', onShootL);
-    if (btnR) btnR.addEventListener('click', onShootR);
-
     size();
-    let ro = null;
-    if ('ResizeObserver' in window) {
-      ro = new ResizeObserver(size);
-      ro.observe(fin);
-    } else {
-      window.addEventListener('resize', size);
-    }
+    window.addEventListener('resize', size);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -257,20 +240,29 @@ export const Finale = () => {
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.05 }
     );
 
     observer.observe(fin);
 
     return () => {
       observer.disconnect();
-      if (ro) ro.disconnect();
       window.removeEventListener('resize', size);
-      if (btnL) btnL.removeEventListener('click', onShootL);
-      if (btnR) btnR.removeEventListener('click', onShootR);
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
+
+  const handleShootL = () => {
+    if (burstRef.current && shootLRef.current) {
+      burstRef.current(shootLRef.current, 1);
+    }
+  };
+
+  const handleShootR = () => {
+    if (burstRef.current && shootRRef.current) {
+      burstRef.current(shootRRef.current, -1);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -319,7 +311,7 @@ export const Finale = () => {
       <canvas className="fx" ref={canvasRef} aria-hidden="true"></canvas>
 
       {/* Waitlist Form Card */}
-      <div className="join rv" id="join">
+      <div className="join rv in" id="join">
         <h2 className="disp">Oya, let's go.</h2>
         <p>Be first in line when OyaPay opens in your corridor.</p>
 
@@ -380,7 +372,14 @@ export const Finale = () => {
       </div>
 
       {/* Left Shooter */}
-      <button className="shooter l" ref={shootLRef} id="shootL" aria-label="Shoot coins">
+      <button
+        type="button"
+        className="shooter l"
+        ref={shootLRef}
+        id="shootL"
+        onClick={handleShootL}
+        aria-label="Shoot coins"
+      >
         <span className="hint">tap me</span>
         <span className="nozzle"></span>
         <svg viewBox="0 0 140 140" aria-hidden="true">
@@ -395,7 +394,14 @@ export const Finale = () => {
       </button>
 
       {/* Right Shooter */}
-      <button className="shooter r" ref={shootRRef} id="shootR" aria-label="Shoot coins">
+      <button
+        type="button"
+        className="shooter r"
+        ref={shootRRef}
+        id="shootR"
+        onClick={handleShootR}
+        aria-label="Shoot coins"
+      >
         <span className="hint">tap me</span>
         <span className="nozzle"></span>
         <svg viewBox="0 0 140 140" aria-hidden="true">

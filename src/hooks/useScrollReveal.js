@@ -2,14 +2,19 @@ import { useEffect } from 'react';
 
 export function useScrollReveal() {
   useEffect(() => {
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     const hasIO = 'IntersectionObserver' in window;
-
-    // Scroll reveal observer
-    let io = null;
     const rvEls = Array.from(document.querySelectorAll('.rv'));
 
-    if (hasIO && !reduce) {
+    // Reveal elements already in viewport immediately on mount
+    rvEls.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('in');
+      }
+    });
+
+    let io = null;
+    if (hasIO) {
       io = new IntersectionObserver(
         (entries) => {
           entries.forEach((e) => {
@@ -19,24 +24,26 @@ export function useScrollReveal() {
             }
           });
         },
-        { threshold: 0.12, rootMargin: '0px 0px -5% 0px' }
+        { threshold: 0.05, rootMargin: '40px 0px 40px 0px' }
       );
 
-      rvEls.forEach((el) => io.observe(el));
+      rvEls.forEach((el) => {
+        if (!el.classList.contains('in')) {
+          io.observe(el);
+        }
+      });
     } else {
       rvEls.forEach((el) => el.classList.add('in'));
     }
 
     // Count-up animation
     function count(el) {
+      if (el.dataset.counted) return;
+      el.dataset.counted = 'true';
       const to = +(el.dataset.count || 0);
       const pre = el.dataset.pre || '';
-      if (reduce) {
-        el.textContent = pre + to.toLocaleString('en-NG');
-        return;
-      }
       const t0 = performance.now();
-      const dur = 1200;
+      const dur = 1000;
 
       function step(now) {
         const k = Math.min(1, (now - t0) / dur);
@@ -50,7 +57,7 @@ export function useScrollReveal() {
     let cio = null;
     const countEls = Array.from(document.querySelectorAll('[data-count]'));
 
-    if (hasIO && !reduce) {
+    if (hasIO) {
       cio = new IntersectionObserver(
         (entries) => {
           entries.forEach((e) => {
@@ -60,7 +67,7 @@ export function useScrollReveal() {
             }
           });
         },
-        { threshold: 0.4 }
+        { threshold: 0.1 }
       );
 
       countEls.forEach((el) => {

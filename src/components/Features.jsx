@@ -7,14 +7,6 @@ export const Features = () => {
   const sectionRef = useRef(null);
 
   useEffect(() => {
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      setStep1(3);
-      setStep2(0);
-      setStep3(1);
-      return;
-    }
-
     let t1, t2, t3;
     const el = sectionRef.current;
     if (!el) return;
@@ -34,7 +26,7 @@ export const Features = () => {
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.05 }
     );
 
     observer.observe(el);

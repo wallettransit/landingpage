@@ -42,27 +42,37 @@ export const PayYourWay = () => {
   const curPos = useRef(TS[0]);
   const rafRef = useRef(0);
 
-  // Position tabs and glide dot along arc
+  // Position tabs and glide dot along arc (safely protected for WebKit/iOS Safari)
   const glide = useCallback((toRatio) => {
     const path = pathRef.current;
     const dot = dotRef.current;
     if (!path || !dot) return;
 
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const length = path.getTotalLength();
+    cancelAnimationFrame(rafRef.current);
+
     const from = curPos.current;
     const t0 = performance.now();
-    const dur = reduce ? 1 : 650;
-
-    cancelAnimationFrame(rafRef.current);
+    const dur = 600;
 
     const step = (now) => {
       const k = Math.min(1, (now - t0) / dur);
       const ease = 1 - Math.pow(1 - k, 3);
       curPos.current = from + (toRatio - from) * ease;
-      const pt = path.getPointAtLength(length * curPos.current);
-      dot.setAttribute('cx', pt.x);
-      dot.setAttribute('cy', pt.y);
+
+      try {
+        if (path.getTotalLength) {
+          const length = path.getTotalLength();
+          if (length > 0) {
+            const pt = path.getPointAtLength(length * curPos.current);
+            if (pt) {
+              dot.setAttribute('cx', pt.x);
+              dot.setAttribute('cy', pt.y);
+            }
+          }
+        }
+      } catch (e) {
+        // SVG may be hidden on small screens in Safari
+      }
 
       if (k < 1) {
         rafRef.current = requestAnimationFrame(step);
@@ -80,31 +90,38 @@ export const PayYourWay = () => {
     }
   }, [glide]);
 
-  // Initial tab positioning on curve
+  // Initial tab positioning on curve with Safari DOMException safeguard
   useEffect(() => {
     const path = pathRef.current;
     if (!path) return;
-    const length = path.getTotalLength();
 
-    tabRefs.current.forEach((btn, i) => {
-      if (!btn) return;
-      const pt = path.getPointAtLength(length * TS[i]);
-      btn.style.left = `${(pt.x / VB.w) * 100}%`;
-      btn.style.top = `${(pt.y / VB.h) * 100}%`;
-    });
+    try {
+      if (path.getTotalLength) {
+        const length = path.getTotalLength();
+        if (length > 0) {
+          tabRefs.current.forEach((btn, i) => {
+            if (!btn) return;
+            const pt = path.getPointAtLength(length * TS[i]);
+            if (pt) {
+              btn.style.left = `${(pt.x / VB.w) * 100}%`;
+              btn.style.top = `${(pt.y / VB.h) * 100}%`;
+            }
+          });
 
-    const initPt = path.getPointAtLength(length * TS[0]);
-    if (dotRef.current) {
-      dotRef.current.setAttribute('cx', initPt.x);
-      dotRef.current.setAttribute('cy', initPt.y);
+          const initPt = path.getPointAtLength(length * TS[0]);
+          if (dotRef.current && initPt) {
+            dotRef.current.setAttribute('cx', initPt.x);
+            dotRef.current.setAttribute('cy', initPt.y);
+          }
+        }
+      }
+    } catch (e) {
+      // SVG not measurable (e.g. display:none on mobile)
     }
   }, []);
 
-  // Gentle auto-tour
+  // Auto-tour (works on mobile and desktop)
   useEffect(() => {
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
-
     let tourTimer = null;
     const arcEl = arcRef.current;
     if (!arcEl) return;
@@ -132,7 +149,7 @@ export const PayYourWay = () => {
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.1 }
     );
 
     observer.observe(arcEl);
@@ -279,6 +296,7 @@ export const PayYourWay = () => {
 
             {/* Scan Tab */}
             <button
+              type="button"
               className="arc-tab"
               role="tab"
               aria-selected={activeIdx === 0}
@@ -298,6 +316,7 @@ export const PayYourWay = () => {
 
             {/* Tap Tab */}
             <button
+              type="button"
               className="arc-tab"
               role="tab"
               aria-selected={activeIdx === 1}
@@ -317,6 +336,7 @@ export const PayYourWay = () => {
 
             {/* Dial Tab */}
             <button
+              type="button"
               className="arc-tab"
               role="tab"
               aria-selected={activeIdx === 2}
@@ -342,6 +362,7 @@ export const PayYourWay = () => {
 
             {/* Auto Tab */}
             <button
+              type="button"
               className="arc-tab"
               role="tab"
               aria-selected={activeIdx === 3}

@@ -25,18 +25,13 @@ export const RouteSection = () => {
 
   useEffect(() => {
     updateIndicator(activeTab);
-    window.addEventListener('resize', () => updateIndicator(activeTab));
-    return () => window.removeEventListener('resize', () => updateIndicator(activeTab));
+    const handleResize = () => updateIndicator(activeTab);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [activeTab]);
 
   // Dispute Stepper
   useEffect(() => {
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      setDisputeStep(3);
-      return;
-    }
-
     let timer = null;
     const el = ctlRef.current;
     if (!el) return;
@@ -56,7 +51,7 @@ export const RouteSection = () => {
           }
         });
       },
-      { threshold: 0.25 }
+      { threshold: 0.05 }
     );
 
     observer.observe(el);
@@ -97,6 +92,7 @@ export const RouteSection = () => {
             {TABS.map((tab, idx) => (
               <button
                 key={tab.id}
+                type="button"
                 role="tab"
                 aria-selected={activeTab === idx}
                 tabIndex={activeTab === idx ? 0 : -1}
