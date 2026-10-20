@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QRCode } from './QRCode';
 import { KekeRoad } from './KekeRoad';
+import { PoweredBy } from './PoweredBy';
 import { sound } from '../services/sound';
 
 export const Hero = () => {
@@ -154,6 +155,7 @@ export const Hero = () => {
             See how it works ↓
           </a>
         </div>
+        <PoweredBy />
       </div>
 
       <div className="stage" id="heroStage" ref={stageRef}>

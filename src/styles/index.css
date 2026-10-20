@@ -625,6 +625,97 @@ ul {
   flex-wrap: wrap;
 }
 
+/* ---------- Powered By Trust Badge Strip ---------- */
+.powered-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 38px;
+  margin-bottom: 12px;
+}
+
+.powered-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(11, 20, 16, 0.72);
+}
+
+.powered-shield {
+  display: flex;
+  align-items: center;
+  color: var(--ink);
+}
+
+.powered-label {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: rgba(11, 20, 16, 0.72);
+}
+
+.powered-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 10px 28px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  border: 1px solid rgba(11, 20, 16, 0.08);
+  box-shadow: 0 10px 30px -4px rgba(11, 20, 16, 0.12), 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s;
+}
+
+.powered-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -4px rgba(11, 20, 16, 0.18), 0 6px 14px rgba(0, 0, 0, 0.06);
+}
+
+.partner-item {
+  display: flex;
+  align-items: center;
+  height: 28px;
+}
+
+.partner-svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.partner-visa {
+  height: 20px;
+}
+
+.partner-moniepoint {
+  height: 23px;
+}
+
+.partner-paystack {
+  height: 21px;
+}
+
+.partner-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(11, 20, 16, 0.12);
+}
+
+@media (max-width: 600px) {
+  .powered-card {
+    gap: 14px;
+    padding: 8px 18px;
+  }
+  .partner-visa { height: 17px; }
+  .partner-moniepoint { height: 21px; }
+  .partner-paystack { height: 18px; }
+  .partner-divider { height: 16px; }
+}
+
 .stage {
   position: relative;
   height: clamp(540px, 62vw, 760px);
