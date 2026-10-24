@@ -1,0 +1,138 @@
+[
+  {
+    "idx": 0,
+    "title": "Home",
+    "desc": "Your balance and your next ride, one tap apart.",
+    "alt": "OyaPay rider home screen showing wallet balance",
+    "filename": "01-home.webp",
+    "size": 35034
+  },
+  {
+    "idx": 1,
+    "title": "Scan",
+    "desc": "Point at the code in the vehicle. It locks on by itself.",
+    "alt": "Scan to pay screen locking onto a vehicle code",
+    "filename": "02-scan.webp",
+    "size": 16898
+  },
+  {
+    "idx": 2,
+    "title": "Pick your stop",
+    "desc": "See the exact fare before you pay.",
+    "alt": "Stop picker listing fares per stop",
+    "filename": "03-pick-your-stop.webp",
+    "size": 25268
+  },
+  {
+    "idx": 3,
+    "title": "Slide to pay",
+    "desc": "A deliberate slide, so no accidental charges.",
+    "alt": "Slide to pay confirmation screen",
+    "filename": "04-slide-to-pay.webp",
+    "size": 20478
+  },
+  {
+    "idx": 4,
+    "title": "Your ticket",
+    "desc": "A live stripe shows it is real, not a screenshot.",
+    "alt": "Paid ticket with live stripe",
+    "filename": "05-your-ticket.webp",
+    "size": 27890
+  },
+  {
+    "idx": 5,
+    "title": "Wallet",
+    "desc": "Top up once, ride all week.",
+    "alt": "Wallet screen with balance and top-up",
+    "filename": "06-wallet.webp",
+    "size": 35836
+  },
+  {
+    "idx": 6,
+    "title": "Rides and spend",
+    "desc": "Every fare and receipt in one list.",
+    "alt": "Rides and spend history",
+    "filename": "07-rides-and-spend.webp",
+    "size": 31824
+  },
+  {
+    "idx": 7,
+    "title": "Today",
+    "desc": "Fares land live, with a chime.",
+    "alt": "Driver today screen with live payments",
+    "filename": "08-today.webp",
+    "size": 27262
+  },
+  {
+    "idx": 8,
+    "title": "Net income",
+    "desc": "Fuel and levies out, real take-home in.",
+    "alt": "Driver net income screen",
+    "filename": "09-net-income.webp",
+    "size": 29048
+  },
+  {
+    "idx": 9,
+    "title": "Cash out",
+    "desc": "Money in your wallet, bank when you are ready.",
+    "alt": "Driver cash out screen",
+    "filename": "10-cash-out.webp",
+    "size": 32536
+  },
+  {
+    "idx": 10,
+    "title": "Withdraw",
+    "desc": "Slide to send it to your bank.",
+    "alt": "Driver withdraw screen",
+    "filename": "11-withdraw.webp",
+    "size": 26486
+  },
+  {
+    "idx": 11,
+    "title": "Home",
+    "desc": "Easy on the eyes for night rides.",
+    "alt": "Rider home in dark mode",
+    "filename": "12-home.webp",
+    "size": 29382
+  },
+  {
+    "idx": 12,
+    "title": "Scan",
+    "desc": "Same lock-on, darker frame.",
+    "alt": "Scan screen in dark mode",
+    "filename": "13-scan.webp",
+    "size": 15894
+  },
+  {
+    "idx": 13,
+    "title": "Slide to pay",
+    "desc": "Clear contrast, big targets.",
+    "alt": "Slide to pay in dark mode",
+    "filename": "14-slide-to-pay.webp",
+    "size": 18220
+  },
+  {
+    "idx": 14,
+    "title": "Ticket",
+    "desc": "Readable at a glance on a night ride.",
+    "alt": "Ticket in dark mode",
+    "filename": "15-ticket.webp",
+    "size": 26912
+  },
+  {
+    "idx": 15,
+    "title": "Wallet",
+    "desc": "Balance first, always.",
+    "alt": "Wallet in dark mode",
+    "filename": "16-wallet.webp",
+    "size": 30944
+  },
+  {
+    "idx": 16,
+    "title": "Driver today",
+    "desc": "Live fares after dark.",
+    "alt": "Driver today screen in dark mode",
+    "filename": "17-driver-today.webp",
+    "size": 25876
+  }
+]

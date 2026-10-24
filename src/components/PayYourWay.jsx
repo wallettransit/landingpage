@@ -30,8 +30,7 @@ const MODES = [
   },
 ];
 
-const VB = { w: 1000, h: 230 };
-const TS = [0.05, 0.36, 0.64, 0.95];
+const RATIOS = [0.05, 0.36, 0.64, 0.95];
 
 export const PayYourWay = () => {
   const [activeIdx, setActiveIdx] = useState(0);
@@ -39,153 +38,97 @@ export const PayYourWay = () => {
   const dotRef = useRef(null);
   const tabRefs = useRef([]);
   const arcRef = useRef(null);
-  const userInteracted = useRef(false);
-  const curPos = useRef(TS[0]);
+  const curPos = useRef(RATIOS[0]);
   const rafRef = useRef(0);
 
-  // Position tabs and glide dot along arc (safely protected for WebKit/iOS Safari)
+  // Position indicator dot and tab elements along the SVG quadratic arc curve
   const glide = useCallback((toRatio) => {
     const path = pathRef.current;
     const dot = dotRef.current;
     if (!path || !dot) return;
 
     cancelAnimationFrame(rafRef.current);
-
     const from = curPos.current;
     const t0 = performance.now();
-    const dur = 600;
+    const dur = 550;
 
     const step = (now) => {
       const k = Math.min(1, (now - t0) / dur);
       const ease = 1 - Math.pow(1 - k, 3);
-      curPos.current = from + (toRatio - from) * ease;
+      const cur = from + (toRatio - from) * ease;
+      curPos.current = cur;
 
       try {
-        if (path.getTotalLength) {
-          const length = path.getTotalLength();
-          if (length > 0) {
-            const pt = path.getPointAtLength(length * curPos.current);
-            if (pt) {
-              dot.setAttribute('cx', pt.x);
-              dot.setAttribute('cy', pt.y);
-            }
-          }
+        const total = path.getTotalLength();
+        if (total > 0) {
+          const pt = path.getPointAtLength(total * cur);
+          dot.setAttribute('cx', pt.x.toFixed(1));
+          dot.setAttribute('cy', pt.y.toFixed(1));
         }
-      } catch (e) {
-        // SVG may be hidden on small screens in Safari
-      }
+      } catch (e) {}
 
       if (k < 1) {
         rafRef.current = requestAnimationFrame(step);
       }
     };
-
     rafRef.current = requestAnimationFrame(step);
   }, []);
 
-  const selectTab = useCallback((idx, shouldFocus = false) => {
-    setActiveIdx(idx);
-    glide(TS[idx]);
-    if (shouldFocus && tabRefs.current[idx]) {
-      tabRefs.current[idx].focus();
-    }
-  }, [glide]);
-
-  // Initial tab positioning on curve with Safari DOMException safeguard
-  useEffect(() => {
+  const placeTabs = useCallback(() => {
     const path = pathRef.current;
-    if (!path) return;
+    const arc = arcRef.current;
+    if (!path || !arc) return;
+
+    if (window.innerWidth <= 820) {
+      tabRefs.current.forEach((tab) => {
+        if (tab) {
+          tab.style.left = '';
+          tab.style.top = '';
+        }
+      });
+      return;
+    }
 
     try {
-      if (path.getTotalLength) {
-        const length = path.getTotalLength();
-        if (length > 0) {
-          tabRefs.current.forEach((btn, i) => {
-            if (!btn) return;
-            const pt = path.getPointAtLength(length * TS[i]);
-            if (pt) {
-              btn.style.left = `${(pt.x / VB.w) * 100}%`;
-              btn.style.top = `${(pt.y / VB.h) * 100}%`;
-            }
-          });
+      const total = path.getTotalLength();
+      if (!total || total <= 0) return;
 
-          const initPt = path.getPointAtLength(length * TS[0]);
-          if (dotRef.current && initPt) {
-            dotRef.current.setAttribute('cx', initPt.x);
-            dotRef.current.setAttribute('cy', initPt.y);
-          }
-        }
+      tabRefs.current.forEach((tab, i) => {
+        if (!tab) return;
+        const pt = path.getPointAtLength(total * RATIOS[i]);
+        tab.style.left = ((pt.x / 1000) * 100).toFixed(2) + '%';
+        tab.style.top = ((pt.y / 230) * 100).toFixed(2) + '%';
+      });
+
+      const activePt = path.getPointAtLength(total * RATIOS[activeIdx]);
+      if (dotRef.current) {
+        dotRef.current.setAttribute('cx', activePt.x.toFixed(1));
+        dotRef.current.setAttribute('cy', activePt.y.toFixed(1));
       }
-    } catch (e) {
-      // SVG not measurable (e.g. display:none on mobile)
-    }
-  }, []);
+    } catch (err) {}
+  }, [activeIdx]);
 
-  // Auto-tour (works on mobile and desktop)
   useEffect(() => {
-    let tourTimer = null;
-    const arcEl = arcRef.current;
-    if (!arcEl) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting && !userInteracted.current) {
-            if (!tourTimer) {
-              tourTimer = setInterval(() => {
-                if (userInteracted.current) {
-                  clearInterval(tourTimer);
-                  return;
-                }
-                setActiveIdx((prev) => {
-                  const next = (prev + 1) % 4;
-                  glide(TS[next]);
-                  return next;
-                });
-              }, 4200);
-            }
-          } else {
-            clearInterval(tourTimer);
-            tourTimer = null;
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(arcEl);
+    placeTabs();
+    window.addEventListener('resize', placeTabs);
     return () => {
-      clearInterval(tourTimer);
-      observer.disconnect();
+      window.removeEventListener('resize', placeTabs);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [glide]);
+  }, [placeTabs]);
 
-  const handleKeyDown = (e, i) => {
-    userInteracted.current = true;
-    if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      sound.playTap();
-      selectTab((i + 1) % 4, true);
-    } else if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      sound.playTap();
-      selectTab((i + 3) % 4, true);
-    }
-  };
-
-  const handleTabClick = (i) => {
-    userInteracted.current = true;
+  const handleSelectMode = (idx) => {
+    setActiveIdx(idx);
+    glide(RATIOS[idx]);
     sound.playTap();
-    selectTab(i);
   };
 
-  const activeMode = MODES[activeIdx];
+  const mode = MODES[activeIdx];
 
   return (
     <section className="pay" id="pay">
       <div className="wrap">
-        <h2 className="disp big rv">
+        <h2 className="disp big split">
           Pay <span className="em">your way</span>
         </h2>
         <p className="lede rv" style={{ '--d': '.1s' }}>
@@ -196,8 +139,8 @@ export const PayYourWay = () => {
           <div className="phone rv" style={{ '--d': '.15s' }}>
             <div className="notch"></div>
             <div className="screen">
-              {/* Scan Mode */}
-              <div className={`mode ${activeMode.k === 'scan' ? 'on' : ''}`} data-mode="scan">
+              {/* Scan mode */}
+              <div className={`mode ${mode.k === 'scan' ? 'on' : ''}`} data-mode="scan">
                 <div className="sc-top">
                   <span>Scan to pay</span>
                   <span>OyaPay</span>
@@ -205,7 +148,7 @@ export const PayYourWay = () => {
                 <div className="vf">
                   <i></i><i></i><i></i><i></i>
                   <div className="qr">
-                    <QRCode n={21} />
+                    <QRCode value="21" size={150} />
                   </div>
                   <div className="line"></div>
                 </div>
@@ -215,8 +158,8 @@ export const PayYourWay = () => {
                 </div>
               </div>
 
-              {/* Tap Mode */}
-              <div className={`mode ${activeMode.k === 'tap' ? 'on' : ''}`} data-mode="tap">
+              {/* Tap mode */}
+              <div className={`mode ${mode.k === 'tap' ? 'on' : ''}`} data-mode="tap">
                 <div className="sc-top">
                   <span>Tap to pay</span>
                   <span>OyaPay</span>
@@ -238,8 +181,8 @@ export const PayYourWay = () => {
                 </div>
               </div>
 
-              {/* Dial Mode */}
-              <div className={`mode ${activeMode.k === 'dial' ? 'on' : ''}`} data-mode="dial">
+              {/* Dial mode */}
+              <div className={`mode ${mode.k === 'dial' ? 'on' : ''}`} data-mode="dial">
                 <div className="sc-top">
                   <span>Dial to pay</span>
                   <span>No data needed</span>
@@ -256,8 +199,8 @@ export const PayYourWay = () => {
                 <div className="confirm later">Pay ₦250 → Maryland</div>
               </div>
 
-              {/* Auto Mode */}
-              <div className={`mode ${activeMode.k === 'auto' ? 'on' : ''}`} data-mode="auto">
+              {/* Auto mode */}
+              <div className={`mode ${mode.k === 'auto' ? 'on' : ''}`} data-mode="auto">
                 <div className="sc-top">
                   <span>You just boarded</span>
                   <span>Nearby</span>
@@ -271,9 +214,10 @@ export const PayYourWay = () => {
                   <span>Vehicle detected</span>
                   <b>LND 412 XA</b>
                 </div>
-                <div className="row" style={{ marginTop: '12px' }}>
+                <div className="row" style={{ marginTop: 12 }}>
                   <div>
-                    Ikorodu → TBS<small>Confirm your stop</small>
+                    Ikorodu → TBS
+                    <small>Confirm your stop</small>
                   </div>
                   <b>₦250</b>
                 </div>
@@ -282,7 +226,6 @@ export const PayYourWay = () => {
             </div>
           </div>
 
-          {/* Interactive Arc */}
           <div className="arc" id="arc" ref={arcRef} role="tablist" aria-label="Ways to pay">
             <svg viewBox="0 0 1000 230" aria-hidden="true">
               <path
@@ -290,7 +233,7 @@ export const PayYourWay = () => {
                 ref={pathRef}
                 d="M 60 50 Q 500 270 940 50"
                 fill="none"
-                stroke="#26332C"
+                stroke="#2f4037"
                 strokeWidth="3"
                 strokeDasharray="3 12"
                 strokeLinecap="round"
@@ -300,19 +243,16 @@ export const PayYourWay = () => {
 
             {/* Scan Tab */}
             <button
-              type="button"
               className="arc-tab"
               role="tab"
               aria-selected={activeIdx === 0}
-              tabIndex={activeIdx === 0 ? 0 : -1}
-              ref={(el) => (tabRefs.current[0] = el)}
-              onClick={() => handleTabClick(0)}
-              onKeyDown={(e) => handleKeyDown(e, 0)}
               id="tab-scan"
+              ref={(el) => (tabRefs.current[0] = el)}
+              onClick={() => handleSelectMode(0)}
             >
               <span className="ic">
                 <svg viewBox="0 0 24 24">
-                  <path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2M7 12h10" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2M7 12h10" />
                 </svg>
               </span>
               <span className="lb">Scan</span>
@@ -320,19 +260,16 @@ export const PayYourWay = () => {
 
             {/* Tap Tab */}
             <button
-              type="button"
               className="arc-tab"
               role="tab"
               aria-selected={activeIdx === 1}
-              tabIndex={activeIdx === 1 ? 0 : -1}
-              ref={(el) => (tabRefs.current[1] = el)}
-              onClick={() => handleTabClick(1)}
-              onKeyDown={(e) => handleKeyDown(e, 1)}
               id="tab-tap"
+              ref={(el) => (tabRefs.current[1] = el)}
+              onClick={() => handleSelectMode(1)}
             >
               <span className="ic">
                 <svg viewBox="0 0 24 24">
-                  <path d="M8 7a7 7 0 010 10M12 4.5a11 11 0 010 15M16 2a15 15 0 010 20" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M8 7a7 7 0 010 10M12 4.5a11 11 0 010 15M16 2a15 15 0 010 20" />
                 </svg>
               </span>
               <span className="lb">Tap</span>
@@ -340,25 +277,22 @@ export const PayYourWay = () => {
 
             {/* Dial Tab */}
             <button
-              type="button"
               className="arc-tab"
               role="tab"
               aria-selected={activeIdx === 2}
-              tabIndex={activeIdx === 2 ? 0 : -1}
-              ref={(el) => (tabRefs.current[2] = el)}
-              onClick={() => handleTabClick(2)}
-              onKeyDown={(e) => handleKeyDown(e, 2)}
               id="tab-dial"
+              ref={(el) => (tabRefs.current[2] = el)}
+              onClick={() => handleSelectMode(2)}
             >
               <span className="ic">
                 <svg viewBox="0 0 24 24">
-                  <circle cx="6" cy="6" r="1.4" fill="currentColor" />
-                  <circle cx="12" cy="6" r="1.4" fill="currentColor" />
-                  <circle cx="18" cy="6" r="1.4" fill="currentColor" />
-                  <circle cx="6" cy="12" r="1.4" fill="currentColor" />
-                  <circle cx="12" cy="12" r="1.4" fill="currentColor" />
-                  <circle cx="18" cy="12" r="1.4" fill="currentColor" />
-                  <circle cx="12" cy="18" r="1.4" fill="currentColor" />
+                  <circle cx="6" cy="6" r="1.4" />
+                  <circle cx="12" cy="6" r="1.4" />
+                  <circle cx="18" cy="6" r="1.4" />
+                  <circle cx="6" cy="12" r="1.4" />
+                  <circle cx="12" cy="12" r="1.4" />
+                  <circle cx="18" cy="12" r="1.4" />
+                  <circle cx="12" cy="18" r="1.4" />
                 </svg>
               </span>
               <span className="lb">Dial</span>
@@ -366,19 +300,16 @@ export const PayYourWay = () => {
 
             {/* Auto Tab */}
             <button
-              type="button"
               className="arc-tab"
               role="tab"
               aria-selected={activeIdx === 3}
-              tabIndex={activeIdx === 3 ? 0 : -1}
-              ref={(el) => (tabRefs.current[3] = el)}
-              onClick={() => handleTabClick(3)}
-              onKeyDown={(e) => handleKeyDown(e, 3)}
               id="tab-auto"
+              ref={(el) => (tabRefs.current[3] = el)}
+              onClick={() => handleSelectMode(3)}
             >
               <span className="ic">
                 <svg viewBox="0 0 24 24">
-                  <path d="M7 7l10 10-5 4V3l5 4L7 17" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M7 7l10 10-5 4V3l5 4L7 17" />
                 </svg>
               </span>
               <span className="lb">Auto</span>
@@ -386,12 +317,14 @@ export const PayYourWay = () => {
           </div>
 
           <div className="mode-desc" id="modeDesc" aria-live="polite">
-            <span className={`tag ${activeMode.live ? 'live' : ''}`}>{activeMode.tag}</span>
-            <h3>{activeMode.t}</h3>
-            <p>{activeMode.d}</p>
+            <span className={`tag ${mode.live ? 'live' : ''}`}>{mode.tag}</span>
+            <h3>{mode.t} to pay</h3>
+            <p>{mode.d}</p>
           </div>
         </div>
       </div>
     </section>
   );
 };
+
+export default PayYourWay;

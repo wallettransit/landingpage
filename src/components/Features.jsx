@@ -7,6 +7,14 @@ export const Features = () => {
   const sectionRef = useRef(null);
 
   useEffect(() => {
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setStep1(3);
+      setStep2(2);
+      setStep3(3);
+      return;
+    }
+
     let t1, t2, t3;
     const el = sectionRef.current;
     if (!el) return;
@@ -26,7 +34,7 @@ export const Features = () => {
           }
         });
       },
-      { threshold: 0.05 }
+      { threshold: 0.1 }
     );
 
     observer.observe(el);
@@ -38,44 +46,39 @@ export const Features = () => {
     };
   }, []);
 
-  const totals = ['₦0', '₦150', '₦400', '₦700'];
-
   return (
     <section className="moves" id="moves" ref={sectionRef}>
       <div className="wrap">
-        <h2 className="disp sec-h rv">
+        <h2 className="disp sec-h split">
           Your fare moves even <span className="em">better</span> with OyaPay.
         </h2>
 
         <div className="grid3">
           {/* Card 1: Instant payment toast */}
-          <article className="fcard rv">
+          <article className="fcard rv spot">
             <div className="mini m1 stepper" data-step={step1} aria-hidden="true">
               <div className="tot">
                 Today
-                <b className={`t0 ${step1 === 0 ? 't-active' : ''}`}>{totals[0]}</b>
-                <b className={`t1 ${step1 === 1 ? 't-active' : ''}`}>{totals[1]}</b>
-                <b className={`t2 ${step1 === 2 ? 't-active' : ''}`}>{totals[2]}</b>
-                <b className={`t3 ${step1 === 3 ? 't-active' : ''}`}>{totals[3]}</b>
+                <b className="t0">₦0</b>
+                <b className="t1">₦150</b>
+                <b className="t2">₦400</b>
+                <b className="t3">₦700</b>
               </div>
-
-              <div className={`toast k1 ${step1 >= 1 ? 'show' : ''}`}>
+              <div className="toast k1">
                 <i>₦</i>
                 <div>
                   <strong>₦150 received</strong>
                   <span>Ojota · just now</span>
                 </div>
               </div>
-
-              <div className={`toast k2 ${step1 >= 2 ? 'show' : ''}`}>
+              <div className="toast k2">
                 <i>₦</i>
                 <div>
                   <strong>₦250 received</strong>
                   <span>Maryland · just now</span>
                 </div>
               </div>
-
-              <div className={`toast k3 ${step1 === 3 ? 'show' : ''}`}>
+              <div className="toast k3">
                 <i>₦</i>
                 <div>
                   <strong>₦300 received</strong>
@@ -83,7 +86,6 @@ export const Features = () => {
                 </div>
               </div>
             </div>
-
             <div className="txt">
               <h3>Paid the second they pay</h3>
               <p>
@@ -93,23 +95,22 @@ export const Features = () => {
           </article>
 
           {/* Card 2: Usual routes */}
-          <article className="fcard rv" style={{ '--d': '.1s' }}>
+          <article className="fcard rv spot" style={{ '--d': '.1s' }}>
             <div className="mini m2 stepper" data-step={step2} aria-hidden="true">
               <small>Your usual routes</small>
-              <div className={`qr2 ${step2 === 0 ? 'active' : ''}`}>
+              <div className="qr2">
                 <span>Ikorodu → TBS</span>
                 <em>Ready</em>
               </div>
-              <div className={`qr2 ${step2 === 1 ? 'active' : ''}`}>
+              <div className="qr2">
                 <span>Ojota → Yaba</span>
                 <em>Ready</em>
               </div>
-              <div className={`qr2 ${step2 === 2 ? 'active' : ''}`}>
+              <div className="qr2">
                 <span>Mile 12 → CMS</span>
                 <em>Ready</em>
               </div>
             </div>
-
             <div className="txt">
               <h3>Your route, one tap away</h3>
               <p>
@@ -119,13 +120,10 @@ export const Features = () => {
           </article>
 
           {/* Card 3: Exact fare highlight */}
-          <article className="fcard rv" style={{ '--d': '.2s' }}>
+          <article className="fcard rv spot" style={{ '--d': '.2s' }}>
             <div className="mini m3 stepper" data-step={step3} aria-hidden="true">
               <div className="list">
-                <div
-                  className="hl"
-                  style={{ transform: `translateY(${step3 * 58}px)` }}
-                ></div>
+                <div className="hl" />
                 <div className="st">
                   <span>Ojota</span>
                   <b>₦150</b>
@@ -144,7 +142,6 @@ export const Features = () => {
                 </div>
               </div>
             </div>
-
             <div className="txt">
               <h3>Exact fare, every stop</h3>
               <p>
@@ -157,3 +154,5 @@ export const Features = () => {
     </section>
   );
 };
+
+export default Features;

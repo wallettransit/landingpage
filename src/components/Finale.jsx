@@ -72,14 +72,6 @@ export const Finale = () => {
       };
     }
 
-    function restNow(p) {
-      const b = Math.max(0, Math.min(hmRef.current.length - 1, (p.x / BW) | 0));
-      p.y = floor() - (hmRef.current[b] || 0) - p.s * 0.25;
-      p.rest = true;
-      p.vx = p.vy = p.vr = 0;
-      hmRef.current[b] = Math.min((hmRef.current[b] || 0) + p.s * 0.3, 240);
-    }
-
     function add(p) {
       partsRef.current.push(p);
       if (partsRef.current.length > 240) {
@@ -287,44 +279,59 @@ export const Finale = () => {
     setSubmitted(true);
   };
 
-  const marqueeText1 = Array(8).fill('Oya! Oya! Oya!').join(' · ');
-  const marqueeText2 = Array(6).fill('Get there. Get paid.').join(' · ');
-
   return (
     <section className="finale" id="finale" ref={finRef}>
       {/* 3-Tier Marquee */}
       <div className="mqs" aria-hidden="true">
         <div className="mq">
           <div className="mqg">
-            <span>{marqueeText1}</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
           </div>
           <div className="mqg" aria-hidden="true">
-            <span>{marqueeText1}</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
           </div>
         </div>
         <div className="mq rev solid">
           <div className="mqg">
-            <span>{marqueeText2}</span>
+            <span>Get there. Get paid.</span>
+            <span>Get there. Get paid.</span>
+            <span>Get there. Get paid.</span>
+            <span>Get there. Get paid.</span>
           </div>
           <div className="mqg" aria-hidden="true">
-            <span>{marqueeText2}</span>
+            <span>Get there. Get paid.</span>
+            <span>Get there. Get paid.</span>
+            <span>Get there. Get paid.</span>
+            <span>Get there. Get paid.</span>
           </div>
         </div>
         <div className="mq">
           <div className="mqg">
-            <span>{marqueeText1}</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
           </div>
           <div className="mqg" aria-hidden="true">
-            <span>{marqueeText1}</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
+            <span>Oya! Oya! Oya!</span>
           </div>
         </div>
       </div>
 
       {/* Physics Canvas */}
-      <canvas className="fx" ref={canvasRef} aria-hidden="true"></canvas>
+      <canvas className="fx" id="fx" ref={canvasRef} aria-hidden="true" />
 
       {/* Waitlist Form Card */}
-      <div className="join rv in" id="join">
+      <div className="join rv" id="join">
         <h2 className="disp">Oya, let's go.</h2>
         <p>Be first in line when OyaPay opens in your corridor.</p>
 
@@ -370,40 +377,36 @@ export const Finale = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <button className="btn btn-ink" type="submit">
-                Join Waitlist
+              <button className="btn btn-ink mag" type="submit">
+                Notify me
               </button>
             </form>
 
             {error && (
-              <div className="err" role="alert" style={{ display: 'block' }}>
+              <div className="err" id="joinErr" role="alert" style={{ display: 'block' }}>
                 Please enter a valid email address.
               </div>
             )}
-            <div className="join-trust-note">
-              🔒 No spam. We only contact you when the corridor opens near you.
-            </div>
           </>
         ) : (
-          <div className="ok-success" role="status">
-            <div className="ok-badge">🎉 Spot Reserved</div>
-            <h4>You're #{queueNumber} on the Lagos Pilot list!</h4>
-            <p>
+          <div className="ok" id="joinOk" role="status" style={{ display: 'block' }}>
+            <p style={{ fontWeight: 700, color: 'var(--em-d)', marginBottom: '14px' }}>
               {who === 'driver'
-                ? "You're prioritized, driver. We're launching corridor by corridor and our team will reach out with early onboard access."
-                : "You're in. As soon as your daily route goes live on OyaPay, you'll be among the first to ride cash-free."}
+                ? "You're on the list, driver. We're starting with drivers, so we'll reach out first."
+                : "You're on the list. We'll reach out when OyaPay opens near you."}
             </p>
-            <div className="share-actions">
+            <div style={{ marginTop: '16px' }}>
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
                   `I just joined the waitlist for OyaPay — the instant wallet for Lagos Danfos & Kekes. No more change wahala! Check it out: https://oyapay.ng`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-wa"
+                className="btn btn-em"
+                style={{ fontSize: '14px', padding: '10px 18px' }}
                 onClick={() => sound.playTap()}
               >
-                <span>Share with fellow commuters on WhatsApp</span>
+                Share on WhatsApp
               </a>
             </div>
           </div>
@@ -420,7 +423,7 @@ export const Finale = () => {
         aria-label="Shoot coins"
       >
         <span className="hint">tap me</span>
-        <span className="nozzle"></span>
+        <span className="nozzle" />
         <svg viewBox="0 0 140 140" aria-hidden="true">
           <g transform="rotate(-32 70 82)">
             <rect x="16" y="58" width="86" height="40" rx="16" fill="#0B1410" />
@@ -442,7 +445,7 @@ export const Finale = () => {
         aria-label="Shoot coins"
       >
         <span className="hint">tap me</span>
-        <span className="nozzle"></span>
+        <span className="nozzle" />
         <svg viewBox="0 0 140 140" aria-hidden="true">
           <g transform="rotate(-32 70 82)">
             <rect x="16" y="58" width="86" height="40" rx="16" fill="#0B1410" />
@@ -456,3 +459,5 @@ export const Finale = () => {
     </section>
   );
 };
+
+export default Finale;

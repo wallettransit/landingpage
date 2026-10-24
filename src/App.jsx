@@ -14,6 +14,7 @@ import { TrustPage } from './pages/TrustPage';
 export function App() {
   return (
     <div className="app-container">
+      <div className="prog" id="prog" aria-hidden="true" />
       <Navbar />
       <main>
         <Routes>
